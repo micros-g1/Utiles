@@ -1,0 +1,40 @@
+\usepackage[utf8]{inputenc}
+% caracteres utf8 (tildes, enie) sin tener que usar comandos
+
+\usepackage[spanish, es-tabla, es-nodecimaldot]{babel} 
+% texto automatico en espaniol
+% "tabla" en vez de "cuadro"
+% no reemplaza puntos decimales por comas
+
+%% NO AGREGAR PAQUETES ANTES DE ESTO, ES IMPORTANTE QUE BABEL ESTE PRIMERO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PAQUETES EXTRA %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{subfiles}
+
+\usepackage{amsmath} % PAQUETES DE MATEMATICA
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+
+\usepackage{steinmetz} % comando \phase{}
+\usepackage{units} % permite usar nicefrac
+\usepackage{graphicx} % importar imagenes
+\usepackage{float} % posicion H para floats
+\usepackage[colorinlistoftodos]{todonotes}
+
+
+\usepackage[a4paper, total={6in, 8in}]{geometry} 
+% margenes correctos en subarchivos
+
+\setlength{\parindent}{10pt}			%cuanta sangria al principio de un parrafo
+\usepackage{indentfirst}				%pone sangria al primer parrafo de una seccion
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% NO AGREGAR PAQUETES DESPUES DE ESTO, ES IMPORTANTE QUE HYPERREF ESTE ULTIMO
+\usepackage[hidelinks]{hyperref} % hipervinculos sin cajitas rojas
+
