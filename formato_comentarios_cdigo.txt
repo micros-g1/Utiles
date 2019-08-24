@@ -1,0 +1,12 @@
+/**************
+*****[function name]****
+***************
+*[function description line 1]
+*[function description line 2]
+*	INPUT:
+*		1)[arg1]: [arg1 description]
+*		2)[arg2]: [arg2 description]
+*
+*	OUTPUT:
+*		[output decription]
+*/
