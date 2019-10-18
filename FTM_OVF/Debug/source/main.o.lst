@@ -1,0 +1,110 @@
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.main,"ax",%progbits
+  18              		.align	1
+  19              		.global	main
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	main:
+  27              	.LFB123:
+  28              		.file 1 "../source/main.c"
+   1:../source/main.c **** /*
+   2:../source/main.c ****  * main.c
+   3:../source/main.c ****  *
+   4:../source/main.c ****  *  Created on: May 1, 2015
+   5:../source/main.c ****  *      Author: Juan Pablo VEGA - Laboratorio de Microprocesadores
+   6:../source/main.c ****  */
+   7:../source/main.c **** 
+   8:../source/main.c **** #include "hardware.h"
+   9:../source/main.c **** #include "PORT.h"
+  10:../source/main.c **** #include "GPIO.h"
+  11:../source/main.c **** #include "FTM.h"
+  12:../source/main.c **** 
+  13:../source/main.c **** 
+  14:../source/main.c **** #define __FOREVER__ 	for(;;)
+  15:../source/main.c **** 
+  16:../source/main.c **** 
+  17:../source/main.c **** 
+  18:../source/main.c **** int main (void)
+  19:../source/main.c **** {
+  29              		.loc 1 19 1
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 1, uses_anonymous_args = 0
+  33 0000 80B5     		push	{r7, lr}
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 7, -8
+  36              		.cfi_offset 14, -4
+  37 0002 00AF     		add	r7, sp, #0
+  38              		.cfi_def_cfa_register 7
+  20:../source/main.c ****  	 	 	 	hw_Init();
+  39              		.loc 1 20 9
+  40 0004 FFF7FEFF 		bl	hw_Init
+  21:../source/main.c ****  	 	 	 	PORT_Init();
+  41              		.loc 1 21 9
+  42 0008 FFF7FEFF 		bl	PORT_Init
+  22:../source/main.c ****  	 	 		GPIO_Init();
+  43              		.loc 1 22 8
+  44 000c FFF7FEFF 		bl	GPIO_Init
+  23:../source/main.c ****  	 	 		FTM_Init();
+  45              		.loc 1 23 8
+  46 0010 FFF7FEFF 		bl	FTM_Init
+  47              	.L2:
+  24:../source/main.c **** 
+  25:../source/main.c **** 
+  26:../source/main.c ****  	 	// 		hw_DisableInterrupts();
+  27:../source/main.c **** 
+  28:../source/main.c ****  	 	 		__FOREVER__;
+  48              		.loc 1 28 8 discriminator 1
+  49 0014 FEE7     		b	.L2
+  50              		.cfi_endproc
+  51              	.LFE123:
+  53              		.text
+  54              	.Letext0:
+  55              		.file 2 "/usr/local/mcuxpressoide-11.0.0_2516/ide/plugins/com.nxp.mcuxpresso.tools.linux_11.0.0.20
+  56              		.file 3 "/usr/local/mcuxpressoide-11.0.0_2516/ide/plugins/com.nxp.mcuxpresso.tools.linux_11.0.0.20
+  57              		.file 4 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/core_cm4.h"
+  58              		.file 5 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/system_MK64F12.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/cc0vTKRm.s:18     .text.main:0000000000000000 $t
+     /tmp/cc0vTKRm.s:26     .text.main:0000000000000000 main
+                           .group:0000000000000000 wm4.0.e9a4c502d1288a7f4530c6554342258b
+                           .group:0000000000000000 wm4.redlib_version.h.16.f905717e4b3a91dcbdbb631865150df4
+                           .group:0000000000000000 wm4.libconfigarm.h.19.34723c94cbd19598192aa6b1e87fca41
+                           .group:0000000000000000 wm4.stdint.h.31.58198de4ea930fb897655479091e17c7
+                           .group:0000000000000000 wm4.stdbool.h.15.fddf1cb2402fd739d8e2516677869231
+                           .group:0000000000000000 wm4.fsl_device_registers.h.32.f10b25a7fd7ad45b9a40904c33f28816
+                           .group:0000000000000000 wm4.MK64F12.h.105.e884e5c80776532d2ec0f5c21e2ea7cb
+                           .group:0000000000000000 wm4.core_cm4.h.42.42f38327ee0970d80f60117e6a3ba2b0
+                           .group:0000000000000000 wm4.cmsis_gcc.h.36.39970cb43ce4b53c82644a1f9bc2eab9
+                           .group:0000000000000000 wm4.core_cm4.h.223.7b48c9958ef5573320c4765074c8b0ce
+                           .group:0000000000000000 wm4.system_MK64F12.h.109.c6d21568e03be21b21c922eb7345d6e3
+                           .group:0000000000000000 wm4.MK64F12.h.475.cafa8e1e521f96f0b72de286863a6df7
+                           .group:0000000000000000 wm4.MK64F12_features.h.92.512cea46d882153168efeec0bc3a9da7
+                           .group:0000000000000000 wm4.hardware.h.27.0531344360c1b4ef1fba1263e2a4c488
+                           .group:0000000000000000 wm4.GPIO.h.3.3ad5afaee119954e5c1de4410a35f962
+                           .group:0000000000000000 wm4.FTM.h.3.6f40a2af0d72d696e1572bcfd1bb3ad6
+
+UNDEFINED SYMBOLS
+hw_Init
+PORT_Init
+GPIO_Init
+FTM_Init
