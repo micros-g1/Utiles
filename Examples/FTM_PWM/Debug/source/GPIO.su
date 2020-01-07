@@ -1,0 +1,8 @@
+GPIO.c:4:6:GPIO_Init	4	static
+GPIO.c:16:6:GPIO_SetDirection	24	static
+GPIO.c:21:17:GPIO_GetDirection	16	static
+GPIO.c:31:6:GPIO_Write	24	static
+GPIO.c:41:12:GPIO_Read	16	static
+GPIO.c:49:6:GPIO_Set	16	static
+GPIO.c:54:6:GPIO_Clear	16	static
+GPIO.c:59:6:GPIO_Toggle	16	static

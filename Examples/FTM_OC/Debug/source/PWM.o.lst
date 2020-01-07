@@ -1,0 +1,218 @@
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"PWM.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.PWM_PISR,"ax",%progbits
+  18              		.align	1
+  19              		.global	PWM_PISR
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	PWM_PISR:
+  27              	.LFB123:
+  28              		.file 1 "../source/PWM.c"
+   1:../source/PWM.c **** 
+   2:../source/PWM.c **** #include "PWM.h"
+   3:../source/PWM.c **** 
+   4:../source/PWM.c **** /// FTM overflow interrupt example
+   5:../source/PWM.c **** 
+   6:../source/PWM.c **** void PWM_PISR (void)
+   7:../source/PWM.c **** {
+  29              		.loc 1 7 1
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 1, uses_anonymous_args = 0
+  33 0000 80B5     		push	{r7, lr}
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 7, -8
+  36              		.cfi_offset 14, -4
+  37 0002 00AF     		add	r7, sp, #0
+  38              		.cfi_def_cfa_register 7
+   8:../source/PWM.c **** 
+   9:../source/PWM.c **** 	FTM_ClearOverflowFlag (FTM0);
+  39              		.loc 1 9 2
+  40 0004 0448     		ldr	r0, .L2
+  41 0006 FFF7FEFF 		bl	FTM_ClearOverflowFlag
+  10:../source/PWM.c **** 	GPIO_Toggle(PTC, 1 << 8);
+  42              		.loc 1 10 2
+  43 000a 4FF48071 		mov	r1, #256
+  44 000e 0348     		ldr	r0, .L2+4
+  45 0010 FFF7FEFF 		bl	GPIO_Toggle
+  11:../source/PWM.c **** 
+  12:../source/PWM.c **** }
+  46              		.loc 1 12 1
+  47 0014 00BF     		nop
+  48 0016 80BD     		pop	{r7, pc}
+  49              	.L3:
+  50              		.align	2
+  51              	.L2:
+  52 0018 00800340 		.word	1073971200
+  53 001c 80F00F40 		.word	1074786432
+  54              		.cfi_endproc
+  55              	.LFE123:
+  57              		.section	.text.PWM_Init,"ax",%progbits
+  58              		.align	1
+  59              		.global	PWM_Init
+  60              		.syntax unified
+  61              		.thumb
+  62              		.thumb_func
+  63              		.fpu fpv4-sp-d16
+  65              	PWM_Init:
+  66              	.LFB124:
+  13:../source/PWM.c **** 
+  14:../source/PWM.c **** void PWM_Init (void)
+  15:../source/PWM.c **** {
+  67              		.loc 1 15 1
+  68              		.cfi_startproc
+  69              		@ args = 0, pretend = 0, frame = 8
+  70              		@ frame_needed = 1, uses_anonymous_args = 0
+  71 0000 80B5     		push	{r7, lr}
+  72              		.cfi_def_cfa_offset 8
+  73              		.cfi_offset 7, -8
+  74              		.cfi_offset 14, -4
+  75 0002 82B0     		sub	sp, sp, #8
+  76              		.cfi_def_cfa_offset 16
+  77 0004 00AF     		add	r7, sp, #0
+  78              		.cfi_def_cfa_register 7
+  16:../source/PWM.c **** 	PCRstr UserPCR;
+  17:../source/PWM.c **** 
+  18:../source/PWM.c **** 	//Set up pin 8 of portC as output for testing in irq
+  19:../source/PWM.c **** 
+  20:../source/PWM.c **** 	UserPCR.PCR=false;			// Default All false, Set only those needed
+  79              		.loc 1 20 13
+  80 0006 0023     		movs	r3, #0
+  81 0008 7B60     		str	r3, [r7, #4]
+  21:../source/PWM.c **** 
+  22:../source/PWM.c **** 	UserPCR.FIELD.DSE=true;
+  82              		.loc 1 22 19
+  83 000a 3B79     		ldrb	r3, [r7, #4]
+  84 000c 43F04003 		orr	r3, r3, #64
+  85 0010 3B71     		strb	r3, [r7, #4]
+  23:../source/PWM.c **** 	UserPCR.FIELD.MUX=PORT_mGPIO;
+  86              		.loc 1 23 19
+  87 0012 7B79     		ldrb	r3, [r7, #5]
+  88 0014 0122     		movs	r2, #1
+  89 0016 62F30203 		bfi	r3, r2, #0, #3
+  90 001a 7B71     		strb	r3, [r7, #5]
+  24:../source/PWM.c **** 	UserPCR.FIELD.IRQC=PORT_eDisabled;
+  91              		.loc 1 24 20
+  92 001c BB79     		ldrb	r3, [r7, #6]
+  93 001e 6FF30303 		bfc	r3, #0, #4
+  94 0022 BB71     		strb	r3, [r7, #6]
+  25:../source/PWM.c **** 
+  26:../source/PWM.c **** 	PORT_Configure2 (PORTC,8,UserPCR);
+  95              		.loc 1 26 2
+  96 0024 7A68     		ldr	r2, [r7, #4]
+  97 0026 0821     		movs	r1, #8
+  98 0028 0E48     		ldr	r0, .L5
+  99 002a FFF7FEFF 		bl	PORT_Configure2
+  27:../source/PWM.c **** 
+  28:../source/PWM.c **** 	GPIO_SetDirection(PTC, 8, GPIO__OUT);
+ 100              		.loc 1 28 2
+ 101 002e 4FF0FF32 		mov	r2, #-1
+ 102 0032 0821     		movs	r1, #8
+ 103 0034 0C48     		ldr	r0, .L5+4
+ 104 0036 FFF7FEFF 		bl	GPIO_SetDirection
+  29:../source/PWM.c **** 
+  30:../source/PWM.c **** 
+  31:../source/PWM.c **** 	FTM_SetPrescaler(FTM0, FTM_PSC_x4);	  /// BusClock=sysclk/2= 50MHz y presccaler = divx4
+ 105              		.loc 1 31 2
+ 106 003a 0221     		movs	r1, #2
+ 107 003c 0B48     		ldr	r0, .L5+8
+ 108 003e FFF7FEFF 		bl	FTM_SetPrescaler
+  32:../source/PWM.c **** 	FTM0->CNTIN=0x00;				  /// overflow period = (MOD-CNTIN+1)x4x(1/BusClock)= 50x4*1/50MHz= 4us
+ 109              		.loc 1 32 6
+ 110 0042 0A4B     		ldr	r3, .L5+8
+ 111              		.loc 1 32 13
+ 112 0044 0022     		movs	r2, #0
+ 113 0046 DA64     		str	r2, [r3, #76]
+  33:../source/PWM.c **** 	FTM0->MOD=50-1;
+ 114              		.loc 1 33 6
+ 115 0048 084B     		ldr	r3, .L5+8
+ 116              		.loc 1 33 11
+ 117 004a 3122     		movs	r2, #49
+ 118 004c 9A60     		str	r2, [r3, #8]
+  34:../source/PWM.c **** 	FTM_SetOverflowMode(FTM0, true);  // ovf interrupt
+ 119              		.loc 1 34 2
+ 120 004e 0121     		movs	r1, #1
+ 121 0050 0648     		ldr	r0, .L5+8
+ 122 0052 FFF7FEFF 		bl	FTM_SetOverflowMode
+  35:../source/PWM.c **** 	FTM_StartClock(FTM0);			  // Clock select
+ 123              		.loc 1 35 2
+ 124 0056 0548     		ldr	r0, .L5+8
+ 125 0058 FFF7FEFF 		bl	FTM_StartClock
+  36:../source/PWM.c **** 
+  37:../source/PWM.c **** 
+  38:../source/PWM.c **** }
+ 126              		.loc 1 38 1
+ 127 005c 00BF     		nop
+ 128 005e 0837     		adds	r7, r7, #8
+ 129              		.cfi_def_cfa_offset 8
+ 130 0060 BD46     		mov	sp, r7
+ 131              		.cfi_def_cfa_register 13
+ 132              		@ sp needed
+ 133 0062 80BD     		pop	{r7, pc}
+ 134              	.L6:
+ 135              		.align	2
+ 136              	.L5:
+ 137 0064 00B00440 		.word	1074049024
+ 138 0068 80F00F40 		.word	1074786432
+ 139 006c 00800340 		.word	1073971200
+ 140              		.cfi_endproc
+ 141              	.LFE124:
+ 143              		.text
+ 144              	.Letext0:
+ 145              		.file 2 "/usr/local/mcuxpressoide-11.0.0_2516/ide/plugins/com.nxp.mcuxpresso.tools.linux_11.0.0.20
+ 146              		.file 3 "/usr/local/mcuxpressoide-11.0.0_2516/ide/plugins/com.nxp.mcuxpresso.tools.linux_11.0.0.20
+ 147              		.file 4 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/core_cm4.h"
+ 148              		.file 5 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/system_MK64F12.h"
+ 149              		.file 6 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/MK64F12.h"
+ 150              		.file 7 "../source/PORT.h"
+ 151              		.file 8 "../source/FTM.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 PWM.c
+     /tmp/ccAt3fgz.s:18     .text.PWM_PISR:0000000000000000 $t
+     /tmp/ccAt3fgz.s:26     .text.PWM_PISR:0000000000000000 PWM_PISR
+     /tmp/ccAt3fgz.s:52     .text.PWM_PISR:0000000000000018 $d
+     /tmp/ccAt3fgz.s:58     .text.PWM_Init:0000000000000000 $t
+     /tmp/ccAt3fgz.s:65     .text.PWM_Init:0000000000000000 PWM_Init
+     /tmp/ccAt3fgz.s:137    .text.PWM_Init:0000000000000064 $d
+                           .group:0000000000000000 wm4.0.e9a4c502d1288a7f4530c6554342258b
+                           .group:0000000000000000 wm4.redlib_version.h.16.f905717e4b3a91dcbdbb631865150df4
+                           .group:0000000000000000 wm4.libconfigarm.h.19.34723c94cbd19598192aa6b1e87fca41
+                           .group:0000000000000000 wm4.stdint.h.31.58198de4ea930fb897655479091e17c7
+                           .group:0000000000000000 wm4.stdbool.h.15.fddf1cb2402fd739d8e2516677869231
+                           .group:0000000000000000 wm4.fsl_device_registers.h.32.f10b25a7fd7ad45b9a40904c33f28816
+                           .group:0000000000000000 wm4.MK64F12.h.105.e884e5c80776532d2ec0f5c21e2ea7cb
+                           .group:0000000000000000 wm4.core_cm4.h.42.42f38327ee0970d80f60117e6a3ba2b0
+                           .group:0000000000000000 wm4.cmsis_gcc.h.36.39970cb43ce4b53c82644a1f9bc2eab9
+                           .group:0000000000000000 wm4.core_cm4.h.223.7b48c9958ef5573320c4765074c8b0ce
+                           .group:0000000000000000 wm4.system_MK64F12.h.109.c6d21568e03be21b21c922eb7345d6e3
+                           .group:0000000000000000 wm4.MK64F12.h.475.cafa8e1e521f96f0b72de286863a6df7
+                           .group:0000000000000000 wm4.MK64F12_features.h.92.512cea46d882153168efeec0bc3a9da7
+                           .group:0000000000000000 wm4.hardware.h.27.0531344360c1b4ef1fba1263e2a4c488
+                           .group:0000000000000000 wm4.GPIO.h.3.3ad5afaee119954e5c1de4410a35f962
+                           .group:0000000000000000 wm4.FTM.h.3.6f40a2af0d72d696e1572bcfd1bb3ad6
+
+UNDEFINED SYMBOLS
+FTM_ClearOverflowFlag
+GPIO_Toggle
+PORT_Configure2
+GPIO_SetDirection
+FTM_SetPrescaler
+FTM_SetOverflowMode
+FTM_StartClock

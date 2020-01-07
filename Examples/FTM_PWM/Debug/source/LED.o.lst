@@ -1,0 +1,569 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 6
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"LED.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.global	puertos
+  22              		.section	.data.puertos,"aw",%progbits
+  23              		.align	2
+  26              	puertos:
+  27 0000 00F00F40 		.word	1074786304
+  28 0004 40F00F40 		.word	1074786368
+  29 0008 80F00F40 		.word	1074786432
+  30 000c C0F00F40 		.word	1074786496
+  31 0010 00F10F40 		.word	1074786560
+  32              		.global	ledrgb
+  33              		.section	.data.ledrgb,"aw",%progbits
+  34              		.align	2
+  37              	ledrgb:
+  38 0000 16000000 		.word	22
+  39 0004 40F00F40 		.word	1074786368
+  40 0008 00A00440 		.word	1074044928
+  41 000c 15000000 		.word	21
+  42 0010 40F00F40 		.word	1074786368
+  43 0014 00A00440 		.word	1074044928
+  44 0018 1A000000 		.word	26
+  45 001c 00F10F40 		.word	1074786560
+  46 0020 00D00440 		.word	1074057216
+  47              		.global	Led_States
+  48              		.section	.data.Led_States,"aw",%progbits
+  49              		.align	2
+  52              	Led_States:
+  53 0000 00000000 		.word	0
+  54 0004 00000000 		.word	0
+  55 0008 00000000 		.word	0
+  56 000c 00000000 		.word	0
+  57 0010 FFFFFFFF 		.word	-1
+  58 0014 FFFFFFFF 		.word	-1
+  59 0018 FFFFFFFF 		.word	-1
+  60 001c 00000000 		.word	0
+  61 0020 FFFFFFFF 		.word	-1
+  62 0024 FFFFFFFF 		.word	-1
+  63 0028 FFFFFFFF 		.word	-1
+  64 002c 00000000 		.word	0
+  65 0030 FFFFFFFF 		.word	-1
+  66 0034 00000000 		.word	0
+  67 0038 00000000 		.word	0
+  68 003c 00000000 		.word	0
+  69 0040 00000000 		.word	0
+  70 0044 FFFFFFFF 		.word	-1
+  71 0048 00000000 		.word	0
+  72 004c FFFFFFFF 		.word	-1
+  73 0050 00000000 		.word	0
+  74 0054 FFFFFFFF 		.word	-1
+  75 0058 FFFFFFFF 		.word	-1
+  76 005c FFFFFFFF 		.word	-1
+  77              		.section	.bss.count,"aw",%nobits
+  78              		.align	2
+  81              	count:
+  82 0000 00000000 		.space	4
+  83              		.section	.text.LED_PISR,"ax",%progbits
+  84              		.align	2
+  85              		.global	LED_PISR
+  86              		.thumb
+  87              		.thumb_func
+  89              	LED_PISR:
+  90              	.LFB123:
+  91              		.file 1 "../source/LED.c"
+   1:../source/LED.c **** #include "LED.h"
+   2:../source/LED.c **** 
+   3:../source/LED.c **** GPIO_Type *puertos[5]=GPIO_BASE_PTRS;
+   4:../source/LED.c **** //puertos[5]->PDDR=0;
+   5:../source/LED.c **** 
+   6:../source/LED.c **** 
+   7:../source/LED.c **** #define PIN_RED 	22   //PTB22
+   8:../source/LED.c **** #define PIN_BLUE 	21   //PTB21
+   9:../source/LED.c **** #define PIN_GREEN 	26 	 //PTE26
+  10:../source/LED.c **** 
+  11:../source/LED.c **** #define PIN_PUSH_BUTTON  4
+  12:../source/LED.c **** #define PORT_PUSH_BUTTON PORTA
+  13:../source/LED.c **** #define GPIO_PORT_PUSH_BUTTON PTA
+  14:../source/LED.c **** 
+  15:../source/LED.c **** 
+  16:../source/LED.c **** 
+  17:../source/LED.c **** // Associate each pin to the corresponding port and gpio port using the following definitions
+  18:../source/LED.c **** 
+  19:../source/LED.c **** typedef struct{
+  20:../source/LED.c **** 
+  21:../source/LED.c **** 	uint32_t pin;
+  22:../source/LED.c **** 	GPIO_Type * gpio_port;   // GPIO Peripheral Access Layer
+  23:../source/LED.c **** 	PORT_Type * port;		 // PORT Peripheral Access Layer
+  24:../source/LED.c **** 
+  25:../source/LED.c **** }PIN_PORT;
+  26:../source/LED.c **** 
+  27:../source/LED.c **** typedef struct {
+  28:../source/LED.c **** 
+  29:../source/LED.c **** 	PIN_PORT red;
+  30:../source/LED.c **** 	PIN_PORT blue;
+  31:../source/LED.c **** 	PIN_PORT green;
+  32:../source/LED.c **** 
+  33:../source/LED.c **** }LED_RGB;
+  34:../source/LED.c **** 
+  35:../source/LED.c **** // PIN - PORT
+  36:../source/LED.c **** LED_RGB ledrgb ={
+  37:../source/LED.c **** 
+  38:../source/LED.c **** 		{PIN_RED,PTB,PORTB},	// Red pin is on PORTB
+  39:../source/LED.c **** 		{PIN_BLUE,PTB,PORTB},   // Blue pin is on PORTB
+  40:../source/LED.c **** 		{PIN_GREEN,PTE,PORTE}   // Green pin is on PORTE
+  41:../source/LED.c **** };
+  42:../source/LED.c **** 
+  43:../source/LED.c **** 
+  44:../source/LED.c **** #define LEDRGB_GPIO_PORT(x) ledrgb.x.gpio_port
+  45:../source/LED.c **** #define LEDRGB_PORT(x) ledrgb.x.port
+  46:../source/LED.c **** #define LEDRGB_PIN(x) ledrgb.x.pin
+  47:../source/LED.c **** 
+  48:../source/LED.c **** 
+  49:../source/LED.c **** 
+  50:../source/LED.c **** // Define Led Polarity
+  51:../source/LED.c **** 
+  52:../source/LED.c **** #define RED_ON 		GPIO__LO  // Active low
+  53:../source/LED.c **** #define BLUE_ON 	GPIO__LO
+  54:../source/LED.c **** #define GREEN_ON 	GPIO__LO
+  55:../source/LED.c **** 
+  56:../source/LED.c **** #define RED_OFF		GPIO__HI  // Active low
+  57:../source/LED.c **** #define BLUE_OFF 	GPIO__HI
+  58:../source/LED.c **** #define GREEN_OFF 	GPIO__HI
+  59:../source/LED.c **** 
+  60:../source/LED.c **** 
+  61:../source/LED.c **** typedef struct {
+  62:../source/LED.c **** uint32_t red;
+  63:../source/LED.c **** uint32_t blue;
+  64:../source/LED.c **** uint32_t green;
+  65:../source/LED.c **** }LEDColor_t;
+  66:../source/LED.c **** 
+  67:../source/LED.c **** LEDColor_t Led_States[]= {
+  68:../source/LED.c **** 
+  69:../source/LED.c **** 		{RED_ON,BLUE_ON, GREEN_ON},     // White
+  70:../source/LED.c **** 		{RED_ON,BLUE_OFF,GREEN_OFF},	// Red
+  71:../source/LED.c **** 		{RED_OFF,BLUE_ON,GREEN_OFF},	// Blue
+  72:../source/LED.c **** 		{RED_OFF,BLUE_OFF,GREEN_ON},	// Green
+  73:../source/LED.c **** 		{RED_OFF,BLUE_ON,GREEN_ON},		// Cyan (Blue+Green)
+  74:../source/LED.c **** 		{RED_ON,BLUE_ON,GREEN_OFF},		// Magenta (Red +Blue)
+  75:../source/LED.c **** 		{RED_ON,BLUE_OFF,GREEN_ON},		// Yellow   (Green + Red)
+  76:../source/LED.c **** 		{RED_OFF,BLUE_OFF,GREEN_OFF}	// Black
+  77:../source/LED.c **** };
+  78:../source/LED.c **** 
+  79:../source/LED.c **** 
+  80:../source/LED.c **** 
+  81:../source/LED.c **** static uint32_t count = 0x00;
+  82:../source/LED.c **** 
+  83:../source/LED.c **** void LED_PISR (void)
+  84:../source/LED.c **** {
+  92              		.loc 1 84 0
+  93              		.cfi_startproc
+  94              		@ args = 0, pretend = 0, frame = 0
+  95              		@ frame_needed = 1, uses_anonymous_args = 0
+  96 0000 98B5     		push	{r3, r4, r7, lr}
+  97              		.cfi_def_cfa_offset 16
+  98              		.cfi_offset 3, -16
+  99              		.cfi_offset 4, -12
+ 100              		.cfi_offset 7, -8
+ 101              		.cfi_offset 14, -4
+ 102 0002 00AF     		add	r7, sp, #0
+ 103              		.cfi_def_cfa_register 7
+  85:../source/LED.c **** 	static uint32_t speed=4;  // 0.5 seg @ tick =125ms
+  86:../source/LED.c **** 
+  87:../source/LED.c **** 
+  88:../source/LED.c **** 	if (speed==0)
+ 104              		.loc 1 88 0
+ 105 0004 2C4B     		ldr	r3, .L4
+ 106 0006 1B68     		ldr	r3, [r3]
+ 107 0008 002B     		cmp	r3, #0
+ 108 000a 4DD1     		bne	.L2
+  89:../source/LED.c **** 	{
+  90:../source/LED.c **** 
+  91:../source/LED.c **** //  						Puerto 		, 	pin 			Valor
+  92:../source/LED.c **** 		GPIO_Write(LEDRGB_GPIO_PORT(red)	,	LEDRGB_PIN(red),  Led_States[count].red);
+ 109              		.loc 1 92 0
+ 110 000c 2B4B     		ldr	r3, .L4+4
+ 111 000e 5868     		ldr	r0, [r3, #4]
+ 112 0010 2A4B     		ldr	r3, .L4+4
+ 113 0012 1C68     		ldr	r4, [r3]
+ 114 0014 2A4B     		ldr	r3, .L4+8
+ 115 0016 1A68     		ldr	r2, [r3]
+ 116 0018 2A49     		ldr	r1, .L4+12
+ 117 001a 1346     		mov	r3, r2
+ 118 001c 5B00     		lsls	r3, r3, #1
+ 119 001e 1344     		add	r3, r3, r2
+ 120 0020 9B00     		lsls	r3, r3, #2
+ 121 0022 0B44     		add	r3, r3, r1
+ 122 0024 1B68     		ldr	r3, [r3]
+ 123 0026 1A46     		mov	r2, r3
+ 124 0028 2146     		mov	r1, r4
+ 125 002a FFF7FEFF 		bl	GPIO_Write
+  93:../source/LED.c **** 		GPIO_Write(LEDRGB_GPIO_PORT(green), 	LEDRGB_PIN(green),Led_States[count].green );
+ 126              		.loc 1 93 0
+ 127 002e 234B     		ldr	r3, .L4+4
+ 128 0030 D869     		ldr	r0, [r3, #28]
+ 129 0032 224B     		ldr	r3, .L4+4
+ 130 0034 9C69     		ldr	r4, [r3, #24]
+ 131 0036 224B     		ldr	r3, .L4+8
+ 132 0038 1A68     		ldr	r2, [r3]
+ 133 003a 2249     		ldr	r1, .L4+12
+ 134 003c 1346     		mov	r3, r2
+ 135 003e 5B00     		lsls	r3, r3, #1
+ 136 0040 1344     		add	r3, r3, r2
+ 137 0042 9B00     		lsls	r3, r3, #2
+ 138 0044 0B44     		add	r3, r3, r1
+ 139 0046 0833     		adds	r3, r3, #8
+ 140 0048 1B68     		ldr	r3, [r3]
+ 141 004a 1A46     		mov	r2, r3
+ 142 004c 2146     		mov	r1, r4
+ 143 004e FFF7FEFF 		bl	GPIO_Write
+  94:../source/LED.c **** 		GPIO_Write(LEDRGB_GPIO_PORT(blue), 	LEDRGB_PIN(blue), Led_States[count].blue );
+ 144              		.loc 1 94 0
+ 145 0052 1A4B     		ldr	r3, .L4+4
+ 146 0054 1869     		ldr	r0, [r3, #16]
+ 147 0056 194B     		ldr	r3, .L4+4
+ 148 0058 DC68     		ldr	r4, [r3, #12]
+ 149 005a 194B     		ldr	r3, .L4+8
+ 150 005c 1A68     		ldr	r2, [r3]
+ 151 005e 1949     		ldr	r1, .L4+12
+ 152 0060 1346     		mov	r3, r2
+ 153 0062 5B00     		lsls	r3, r3, #1
+ 154 0064 1344     		add	r3, r3, r2
+ 155 0066 9B00     		lsls	r3, r3, #2
+ 156 0068 0B44     		add	r3, r3, r1
+ 157 006a 0433     		adds	r3, r3, #4
+ 158 006c 1B68     		ldr	r3, [r3]
+ 159 006e 1A46     		mov	r2, r3
+ 160 0070 2146     		mov	r1, r4
+ 161 0072 FFF7FEFF 		bl	GPIO_Write
+  95:../source/LED.c **** 
+  96:../source/LED.c **** 		count++;
+ 162              		.loc 1 96 0
+ 163 0076 124B     		ldr	r3, .L4+8
+ 164 0078 1B68     		ldr	r3, [r3]
+ 165 007a 0133     		adds	r3, r3, #1
+ 166 007c 104A     		ldr	r2, .L4+8
+ 167 007e 1360     		str	r3, [r2]
+  97:../source/LED.c **** 		count %= 0x08;
+ 168              		.loc 1 97 0
+ 169 0080 0F4B     		ldr	r3, .L4+8
+ 170 0082 1B68     		ldr	r3, [r3]
+ 171 0084 03F00703 		and	r3, r3, #7
+ 172 0088 0D4A     		ldr	r2, .L4+8
+ 173 008a 1360     		str	r3, [r2]
+  98:../source/LED.c **** 
+  99:../source/LED.c **** 
+ 100:../source/LED.c **** 		if (GPIO_Read(GPIO_PORT_PUSH_BUTTON,PIN_PUSH_BUTTON))
+ 174              		.loc 1 100 0
+ 175 008c 0421     		movs	r1, #4
+ 176 008e 0E48     		ldr	r0, .L4+16
+ 177 0090 FFF7FEFF 		bl	GPIO_Read
+ 178 0094 0346     		mov	r3, r0
+ 179 0096 002B     		cmp	r3, #0
+ 180 0098 03D0     		beq	.L3
+ 101:../source/LED.c **** 		speed=4; // 0.5 seg @ tick =125ms
+ 181              		.loc 1 101 0
+ 182 009a 074B     		ldr	r3, .L4
+ 183 009c 0422     		movs	r2, #4
+ 184 009e 1A60     		str	r2, [r3]
+ 185 00a0 02E0     		b	.L2
+ 186              	.L3:
+ 102:../source/LED.c **** 		else
+ 103:../source/LED.c **** 		speed=8; // 1 seg @ tick =125ms
+ 187              		.loc 1 103 0
+ 188 00a2 054B     		ldr	r3, .L4
+ 189 00a4 0822     		movs	r2, #8
+ 190 00a6 1A60     		str	r2, [r3]
+ 191              	.L2:
+ 104:../source/LED.c **** 
+ 105:../source/LED.c **** 
+ 106:../source/LED.c **** 
+ 107:../source/LED.c **** 	}
+ 108:../source/LED.c **** 
+ 109:../source/LED.c **** 	speed--;
+ 192              		.loc 1 109 0
+ 193 00a8 034B     		ldr	r3, .L4
+ 194 00aa 1B68     		ldr	r3, [r3]
+ 195 00ac 013B     		subs	r3, r3, #1
+ 196 00ae 024A     		ldr	r2, .L4
+ 197 00b0 1360     		str	r3, [r2]
+ 110:../source/LED.c **** 
+ 111:../source/LED.c **** }
+ 198              		.loc 1 111 0
+ 199 00b2 00BF     		nop
+ 200 00b4 98BD     		pop	{r3, r4, r7, pc}
+ 201              	.L5:
+ 202 00b6 00BF     		.align	2
+ 203              	.L4:
+ 204 00b8 00000000 		.word	speed.5852
+ 205 00bc 00000000 		.word	ledrgb
+ 206 00c0 00000000 		.word	count
+ 207 00c4 00000000 		.word	Led_States
+ 208 00c8 00F00F40 		.word	1074786304
+ 209              		.cfi_endproc
+ 210              	.LFE123:
+ 212              		.section	.text.LED_Init,"ax",%progbits
+ 213              		.align	2
+ 214              		.global	LED_Init
+ 215              		.thumb
+ 216              		.thumb_func
+ 218              	LED_Init:
+ 219              	.LFB124:
+ 112:../source/LED.c **** 
+ 113:../source/LED.c **** 
+ 114:../source/LED.c **** 
+ 115:../source/LED.c **** 
+ 116:../source/LED.c **** 
+ 117:../source/LED.c **** void LED_Init (void)
+ 118:../source/LED.c **** {
+ 220              		.loc 1 118 0
+ 221              		.cfi_startproc
+ 222              		@ args = 0, pretend = 0, frame = 8
+ 223              		@ frame_needed = 1, uses_anonymous_args = 0
+ 224 0000 80B5     		push	{r7, lr}
+ 225              		.cfi_def_cfa_offset 8
+ 226              		.cfi_offset 7, -8
+ 227              		.cfi_offset 14, -4
+ 228 0002 82B0     		sub	sp, sp, #8
+ 229              		.cfi_def_cfa_offset 16
+ 230 0004 00AF     		add	r7, sp, #0
+ 231              		.cfi_def_cfa_register 7
+ 119:../source/LED.c ****     PCRstr UserPCR;
+ 120:../source/LED.c **** 
+ 121:../source/LED.c **** 	// Call using bit fields
+ 122:../source/LED.c **** 
+ 123:../source/LED.c ****     /******* RED LED PIN ********/
+ 124:../source/LED.c **** 
+ 125:../source/LED.c **** 	UserPCR.PCR=false;			// Default All false, Set only those needed
+ 232              		.loc 1 125 0
+ 233 0006 0023     		movs	r3, #0
+ 234 0008 7B60     		str	r3, [r7, #4]
+ 126:../source/LED.c **** 
+ 127:../source/LED.c **** 	UserPCR.FIELD.DSE=true;
+ 235              		.loc 1 127 0
+ 236 000a 3B79     		ldrb	r3, [r7, #4]
+ 237 000c 43F04003 		orr	r3, r3, #64
+ 238 0010 3B71     		strb	r3, [r7, #4]
+ 128:../source/LED.c **** 	UserPCR.FIELD.MUX=PORT_mGPIO;
+ 239              		.loc 1 128 0
+ 240 0012 7B79     		ldrb	r3, [r7, #5]
+ 241 0014 0122     		movs	r2, #1
+ 242 0016 62F30203 		bfi	r3, r2, #0, #3
+ 243 001a 7B71     		strb	r3, [r7, #5]
+ 129:../source/LED.c **** 	UserPCR.FIELD.IRQC=PORT_eDisabled;
+ 244              		.loc 1 129 0
+ 245 001c BB79     		ldrb	r3, [r7, #6]
+ 246 001e 6FF30303 		bfc	r3, #0, #4
+ 247 0022 BB71     		strb	r3, [r7, #6]
+ 130:../source/LED.c **** 
+ 131:../source/LED.c **** 	PORT_Configure2 (LEDRGB_PORT(red),LEDRGB_PIN(red),UserPCR);
+ 248              		.loc 1 131 0
+ 249 0024 324B     		ldr	r3, .L7
+ 250 0026 9868     		ldr	r0, [r3, #8]
+ 251 0028 314B     		ldr	r3, .L7
+ 252 002a 1B68     		ldr	r3, [r3]
+ 253 002c 7A68     		ldr	r2, [r7, #4]
+ 254 002e 1946     		mov	r1, r3
+ 255 0030 FFF7FEFF 		bl	PORT_Configure2
+ 132:../source/LED.c **** 
+ 133:../source/LED.c **** 	/******* GREEN LED PIN ********/
+ 134:../source/LED.c **** 	UserPCR.PCR=false;			// Default All false, Set only those needed
+ 256              		.loc 1 134 0
+ 257 0034 0023     		movs	r3, #0
+ 258 0036 7B60     		str	r3, [r7, #4]
+ 135:../source/LED.c **** 
+ 136:../source/LED.c **** 	UserPCR.FIELD.DSE=true;
+ 259              		.loc 1 136 0
+ 260 0038 3B79     		ldrb	r3, [r7, #4]
+ 261 003a 43F04003 		orr	r3, r3, #64
+ 262 003e 3B71     		strb	r3, [r7, #4]
+ 137:../source/LED.c **** 	UserPCR.FIELD.MUX=PORT_mGPIO;
+ 263              		.loc 1 137 0
+ 264 0040 7B79     		ldrb	r3, [r7, #5]
+ 265 0042 0122     		movs	r2, #1
+ 266 0044 62F30203 		bfi	r3, r2, #0, #3
+ 267 0048 7B71     		strb	r3, [r7, #5]
+ 138:../source/LED.c **** 	UserPCR.FIELD.IRQC=PORT_eDisabled;
+ 268              		.loc 1 138 0
+ 269 004a BB79     		ldrb	r3, [r7, #6]
+ 270 004c 6FF30303 		bfc	r3, #0, #4
+ 271 0050 BB71     		strb	r3, [r7, #6]
+ 139:../source/LED.c **** 
+ 140:../source/LED.c **** 	PORT_Configure2 (LEDRGB_PORT(green),LEDRGB_PIN(green),UserPCR);
+ 272              		.loc 1 140 0
+ 273 0052 274B     		ldr	r3, .L7
+ 274 0054 186A     		ldr	r0, [r3, #32]
+ 275 0056 264B     		ldr	r3, .L7
+ 276 0058 9B69     		ldr	r3, [r3, #24]
+ 277 005a 7A68     		ldr	r2, [r7, #4]
+ 278 005c 1946     		mov	r1, r3
+ 279 005e FFF7FEFF 		bl	PORT_Configure2
+ 141:../source/LED.c **** 
+ 142:../source/LED.c **** 	/******** BLUE LED PIN ***********/
+ 143:../source/LED.c **** 	UserPCR.PCR=false;			// Default All false, Set only those needed
+ 280              		.loc 1 143 0
+ 281 0062 0023     		movs	r3, #0
+ 282 0064 7B60     		str	r3, [r7, #4]
+ 144:../source/LED.c **** 
+ 145:../source/LED.c **** 	UserPCR.FIELD.DSE=true;
+ 283              		.loc 1 145 0
+ 284 0066 3B79     		ldrb	r3, [r7, #4]
+ 285 0068 43F04003 		orr	r3, r3, #64
+ 286 006c 3B71     		strb	r3, [r7, #4]
+ 146:../source/LED.c **** 	UserPCR.FIELD.MUX=PORT_mGPIO;
+ 287              		.loc 1 146 0
+ 288 006e 7B79     		ldrb	r3, [r7, #5]
+ 289 0070 0122     		movs	r2, #1
+ 290 0072 62F30203 		bfi	r3, r2, #0, #3
+ 291 0076 7B71     		strb	r3, [r7, #5]
+ 147:../source/LED.c **** 	UserPCR.FIELD.IRQC=PORT_eDisabled;
+ 292              		.loc 1 147 0
+ 293 0078 BB79     		ldrb	r3, [r7, #6]
+ 294 007a 6FF30303 		bfc	r3, #0, #4
+ 295 007e BB71     		strb	r3, [r7, #6]
+ 148:../source/LED.c **** 
+ 149:../source/LED.c **** 	PORT_Configure2 (LEDRGB_PORT(blue),LEDRGB_PIN(blue),UserPCR);
+ 296              		.loc 1 149 0
+ 297 0080 1B4B     		ldr	r3, .L7
+ 298 0082 5869     		ldr	r0, [r3, #20]
+ 299 0084 1A4B     		ldr	r3, .L7
+ 300 0086 DB68     		ldr	r3, [r3, #12]
+ 301 0088 7A68     		ldr	r2, [r7, #4]
+ 302 008a 1946     		mov	r1, r3
+ 303 008c FFF7FEFF 		bl	PORT_Configure2
+ 150:../source/LED.c **** 
+ 151:../source/LED.c **** 
+ 152:../source/LED.c **** //  						Puerto 		, 	      pin 			 direccion
+ 153:../source/LED.c **** 
+ 154:../source/LED.c **** 	GPIO_SetDirection(LEDRGB_GPIO_PORT(red)	 ,LEDRGB_PIN(red)	, GPIO__OUT);
+ 304              		.loc 1 154 0
+ 305 0090 174B     		ldr	r3, .L7
+ 306 0092 5868     		ldr	r0, [r3, #4]
+ 307 0094 164B     		ldr	r3, .L7
+ 308 0096 1B68     		ldr	r3, [r3]
+ 309 0098 4FF0FF32 		mov	r2, #-1
+ 310 009c 1946     		mov	r1, r3
+ 311 009e FFF7FEFF 		bl	GPIO_SetDirection
+ 155:../source/LED.c **** 	GPIO_SetDirection(LEDRGB_GPIO_PORT(green),LEDRGB_PIN(green)	, GPIO__OUT);
+ 312              		.loc 1 155 0
+ 313 00a2 134B     		ldr	r3, .L7
+ 314 00a4 D869     		ldr	r0, [r3, #28]
+ 315 00a6 124B     		ldr	r3, .L7
+ 316 00a8 9B69     		ldr	r3, [r3, #24]
+ 317 00aa 4FF0FF32 		mov	r2, #-1
+ 318 00ae 1946     		mov	r1, r3
+ 319 00b0 FFF7FEFF 		bl	GPIO_SetDirection
+ 156:../source/LED.c **** 	GPIO_SetDirection(LEDRGB_GPIO_PORT(blue) ,LEDRGB_PIN(blue)	, GPIO__OUT);
+ 320              		.loc 1 156 0
+ 321 00b4 0E4B     		ldr	r3, .L7
+ 322 00b6 1869     		ldr	r0, [r3, #16]
+ 323 00b8 0D4B     		ldr	r3, .L7
+ 324 00ba DB68     		ldr	r3, [r3, #12]
+ 325 00bc 4FF0FF32 		mov	r2, #-1
+ 326 00c0 1946     		mov	r1, r3
+ 327 00c2 FFF7FEFF 		bl	GPIO_SetDirection
+ 157:../source/LED.c **** 
+ 158:../source/LED.c **** 
+ 159:../source/LED.c **** 
+ 160:../source/LED.c **** 	GPIO_SetDirection(GPIO_PORT_PUSH_BUTTON	,PIN_PUSH_BUTTON, GPIO__IN);
+ 328              		.loc 1 160 0
+ 329 00c6 0022     		movs	r2, #0
+ 330 00c8 0421     		movs	r1, #4
+ 331 00ca 0A48     		ldr	r0, .L7+4
+ 332 00cc FFF7FEFF 		bl	GPIO_SetDirection
+ 161:../source/LED.c **** 
+ 162:../source/LED.c **** 	UserPCR.PCR=false;	// Default All false, Set only those needed
+ 333              		.loc 1 162 0
+ 334 00d0 0023     		movs	r3, #0
+ 335 00d2 7B60     		str	r3, [r7, #4]
+ 163:../source/LED.c **** 	UserPCR.FIELD.MUX=PORT_mGPIO;
+ 336              		.loc 1 163 0
+ 337 00d4 7B79     		ldrb	r3, [r7, #5]
+ 338 00d6 0122     		movs	r2, #1
+ 339 00d8 62F30203 		bfi	r3, r2, #0, #3
+ 340 00dc 7B71     		strb	r3, [r7, #5]
+ 164:../source/LED.c **** 	PORT_Configure2 (PORT_PUSH_BUTTON,PIN_PUSH_BUTTON,UserPCR);
+ 341              		.loc 1 164 0
+ 342 00de 7A68     		ldr	r2, [r7, #4]
+ 343 00e0 0421     		movs	r1, #4
+ 344 00e2 0548     		ldr	r0, .L7+8
+ 345 00e4 FFF7FEFF 		bl	PORT_Configure2
+ 165:../source/LED.c **** 
+ 166:../source/LED.c **** 
+ 167:../source/LED.c **** 
+ 168:../source/LED.c **** 
+ 169:../source/LED.c **** }
+ 346              		.loc 1 169 0
+ 347 00e8 00BF     		nop
+ 348 00ea 0837     		adds	r7, r7, #8
+ 349              		.cfi_def_cfa_offset 8
+ 350 00ec BD46     		mov	sp, r7
+ 351              		.cfi_def_cfa_register 13
+ 352              		@ sp needed
+ 353 00ee 80BD     		pop	{r7, pc}
+ 354              	.L8:
+ 355              		.align	2
+ 356              	.L7:
+ 357 00f0 00000000 		.word	ledrgb
+ 358 00f4 00F00F40 		.word	1074786304
+ 359 00f8 00900440 		.word	1074040832
+ 360              		.cfi_endproc
+ 361              	.LFE124:
+ 363              		.section	.data.speed.5852,"aw",%progbits
+ 364              		.align	2
+ 367              	speed.5852:
+ 368 0000 04000000 		.word	4
+ 369              		.text
+ 370              	.Letext0:
+ 371              		.file 2 "/usr/local/mcuxpressoide-10.0.2_411/ide/tools/redlib/include/stdint.h"
+ 372              		.file 3 "/home/jacoby/Documents/MCUXpresso_10.0.2_411/workspace/ccc/CMSIS/MK64F12.h"
+ 373              		.file 4 "../source/PORT.h"
+ 374              		.file 5 "/home/jacoby/Documents/MCUXpresso_10.0.2_411/workspace/ccc/CMSIS/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 LED.c
+     /tmp/ccPykfOr.s:26     .data.puertos:00000000 puertos
+     /tmp/ccPykfOr.s:23     .data.puertos:00000000 $d
+     /tmp/ccPykfOr.s:37     .data.ledrgb:00000000 ledrgb
+     /tmp/ccPykfOr.s:34     .data.ledrgb:00000000 $d
+     /tmp/ccPykfOr.s:52     .data.Led_States:00000000 Led_States
+     /tmp/ccPykfOr.s:49     .data.Led_States:00000000 $d
+     /tmp/ccPykfOr.s:78     .bss.count:00000000 $d
+     /tmp/ccPykfOr.s:81     .bss.count:00000000 count
+     /tmp/ccPykfOr.s:84     .text.LED_PISR:00000000 $t
+     /tmp/ccPykfOr.s:89     .text.LED_PISR:00000000 LED_PISR
+     /tmp/ccPykfOr.s:204    .text.LED_PISR:000000b8 $d
+     /tmp/ccPykfOr.s:367    .data.speed.5852:00000000 speed.5852
+     /tmp/ccPykfOr.s:213    .text.LED_Init:00000000 $t
+     /tmp/ccPykfOr.s:218    .text.LED_Init:00000000 LED_Init
+     /tmp/ccPykfOr.s:357    .text.LED_Init:000000f0 $d
+     /tmp/ccPykfOr.s:364    .data.speed.5852:00000000 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.0.6bf525fb3e733fd18569950f60b7deed
+                           .group:00000000 wm4.redlib_version.h.16.f905717e4b3a91dcbdbb631865150df4
+                           .group:00000000 wm4.libconfigarm.h.18.1ad1d24f96d0dc8c4cf52dc19b0aa2c7
+                           .group:00000000 wm4.stdint.h.30.079ac5d9930c76ab215c1ab68adcbe08
+                           .group:00000000 wm4.stdbool.h.15.fddf1cb2402fd739d8e2516677869231
+                           .group:00000000 wm4.fsl_device_registers.h.32.f10b25a7fd7ad45b9a40904c33f28816
+                           .group:00000000 wm4.MK64F12.h.105.e884e5c80776532d2ec0f5c21e2ea7cb
+                           .group:00000000 wm4.core_cm4.h.42.42f38327ee0970d80f60117e6a3ba2b0
+                           .group:00000000 wm4.cmsis_gcc.h.36.39970cb43ce4b53c82644a1f9bc2eab9
+                           .group:00000000 wm4.core_cm4.h.223.7b48c9958ef5573320c4765074c8b0ce
+                           .group:00000000 wm4.system_MK64F12.h.109.c6d21568e03be21b21c922eb7345d6e3
+                           .group:00000000 wm4.MK64F12.h.475.cafa8e1e521f96f0b72de286863a6df7
+                           .group:00000000 wm4.MK64F12_features.h.92.512cea46d882153168efeec0bc3a9da7
+                           .group:00000000 wm4.hardware.h.27.0531344360c1b4ef1fba1263e2a4c488
+                           .group:00000000 wm4.GPIO.h.3.3ad5afaee119954e5c1de4410a35f962
+
+UNDEFINED SYMBOLS
+GPIO_Write
+GPIO_Read
+PORT_Configure2
+GPIO_SetDirection

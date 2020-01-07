@@ -1,0 +1,2 @@
+system_MK64F12.c:123:6:SystemInit	4	static
+system_MK64F12.c:147:6:SystemCoreClockUpdate	16	static

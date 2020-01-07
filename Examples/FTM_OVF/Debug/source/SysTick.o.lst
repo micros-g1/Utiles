@@ -1,0 +1,158 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 1
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 6
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.syntax unified
+  17              		.file	"SysTick.c"
+  18              		.text
+  19              	.Ltext0:
+  20              		.cfi_sections	.debug_frame
+  21              		.section	.text.SysTick_Handler,"ax",%progbits
+  22              		.align	2
+  23              		.global	SysTick_Handler
+  24              		.thumb
+  25              		.thumb_func
+  27              	SysTick_Handler:
+  28              	.LFB123:
+  29              		.file 1 "../source/SysTick.c"
+   1:../source/SysTick.c **** 
+   2:../source/SysTick.c **** #include "SysTick.h"
+   3:../source/SysTick.c **** 
+   4:../source/SysTick.c **** #include "LED.h"
+   5:../source/SysTick.c **** 
+   6:../source/SysTick.c **** __ISR__  SysTick_Handler (void)
+   7:../source/SysTick.c **** {
+  30              		.loc 1 7 0
+  31              		.cfi_startproc
+  32              		@ Stack Align: May be called with mis-aligned SP.
+  33              		@ args = 0, pretend = 0, frame = 0
+  34              		@ frame_needed = 1, uses_anonymous_args = 0
+  35 0000 6846     		mov	r0, sp
+  36              		.cfi_register 13, 0
+  37 0002 20F00701 		bic	r1, r0, #7
+  38 0006 8D46     		mov	sp, r1
+  39 0008 89B5     		push	{r0, r3, r7, lr}
+  40              		.cfi_def_cfa_offset 16
+  41              		.cfi_offset 13, -16
+  42              		.cfi_offset 3, -12
+  43              		.cfi_offset 7, -8
+  44              		.cfi_offset 14, -4
+  45 000a 00AF     		add	r7, sp, #0
+  46              		.cfi_def_cfa_register 7
+   8:../source/SysTick.c **** 	LED_PISR();
+  47              		.loc 1 8 0
+  48 000c FFF7FEFF 		bl	LED_PISR
+   9:../source/SysTick.c **** }
+  49              		.loc 1 9 0
+  50 0010 00BF     		nop
+  51 0012 BD46     		mov	sp, r7
+  52              		.cfi_def_cfa_register 13
+  53              		@ sp needed
+  54 0014 BDE88940 		pop	{r0, r3, r7, lr}
+  55              		.cfi_restore 14
+  56              		.cfi_restore 7
+  57              		.cfi_restore 3
+  58              		.cfi_restore 0
+  59              		.cfi_def_cfa_offset 0
+  60 0018 8546     		mov	sp, r0
+  61 001a 7047     		bx	lr
+  62              		.cfi_endproc
+  63              	.LFE123:
+  65              		.section	.text.SysTick_Init,"ax",%progbits
+  66              		.align	2
+  67              		.global	SysTick_Init
+  68              		.thumb
+  69              		.thumb_func
+  71              	SysTick_Init:
+  72              	.LFB124:
+  10:../source/SysTick.c **** 
+  11:../source/SysTick.c **** void SysTick_Init (void)
+  12:../source/SysTick.c **** {
+  73              		.loc 1 12 0
+  74              		.cfi_startproc
+  75              		@ args = 0, pretend = 0, frame = 0
+  76              		@ frame_needed = 1, uses_anonymous_args = 0
+  77              		@ link register save eliminated.
+  78 0000 80B4     		push	{r7}
+  79              		.cfi_def_cfa_offset 4
+  80              		.cfi_offset 7, -4
+  81 0002 00AF     		add	r7, sp, #0
+  82              		.cfi_def_cfa_register 7
+  13:../source/SysTick.c **** 	SysTick->CTRL = 0x00;
+  83              		.loc 1 13 0
+  84 0004 084B     		ldr	r3, .L3
+  85 0006 0022     		movs	r2, #0
+  86 0008 1A60     		str	r2, [r3]
+  14:../source/SysTick.c **** 	SysTick->LOAD = 12500000L-1; //12499999L; // <= 125 ms @ 100Mhz
+  87              		.loc 1 14 0
+  88 000a 074B     		ldr	r3, .L3
+  89 000c 074A     		ldr	r2, .L3+4
+  90 000e 5A60     		str	r2, [r3, #4]
+  15:../source/SysTick.c **** 	SysTick->VAL  = 0x00;
+  91              		.loc 1 15 0
+  92 0010 054B     		ldr	r3, .L3
+  93 0012 0022     		movs	r2, #0
+  94 0014 9A60     		str	r2, [r3, #8]
+  16:../source/SysTick.c **** 	SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+  95              		.loc 1 16 0
+  96 0016 044B     		ldr	r3, .L3
+  97 0018 0722     		movs	r2, #7
+  98 001a 1A60     		str	r2, [r3]
+  17:../source/SysTick.c **** }
+  99              		.loc 1 17 0
+ 100 001c 00BF     		nop
+ 101 001e BD46     		mov	sp, r7
+ 102              		.cfi_def_cfa_register 13
+ 103              		@ sp needed
+ 104 0020 5DF8047B 		ldr	r7, [sp], #4
+ 105              		.cfi_restore 7
+ 106              		.cfi_def_cfa_offset 0
+ 107 0024 7047     		bx	lr
+ 108              	.L4:
+ 109 0026 00BF     		.align	2
+ 110              	.L3:
+ 111 0028 10E000E0 		.word	-536813552
+ 112 002c 1FBCBE00 		.word	12499999
+ 113              		.cfi_endproc
+ 114              	.LFE124:
+ 116              		.text
+ 117              	.Letext0:
+ 118              		.file 2 "/usr/local/mcuxpressoide-10.0.2_411/ide/tools/redlib/include/stdint.h"
+ 119              		.file 3 "/home/jacoby/Documents/MCUXpresso_10.0.2_411/workspace/ccc/CMSIS/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 SysTick.c
+     /tmp/ccLSU7E6.s:22     .text.SysTick_Handler:00000000 $t
+     /tmp/ccLSU7E6.s:27     .text.SysTick_Handler:00000000 SysTick_Handler
+     /tmp/ccLSU7E6.s:66     .text.SysTick_Init:00000000 $t
+     /tmp/ccLSU7E6.s:71     .text.SysTick_Init:00000000 SysTick_Init
+     /tmp/ccLSU7E6.s:111    .text.SysTick_Init:00000028 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.0.6bf525fb3e733fd18569950f60b7deed
+                           .group:00000000 wm4.redlib_version.h.16.f905717e4b3a91dcbdbb631865150df4
+                           .group:00000000 wm4.libconfigarm.h.18.1ad1d24f96d0dc8c4cf52dc19b0aa2c7
+                           .group:00000000 wm4.stdint.h.30.079ac5d9930c76ab215c1ab68adcbe08
+                           .group:00000000 wm4.stdbool.h.15.fddf1cb2402fd739d8e2516677869231
+                           .group:00000000 wm4.fsl_device_registers.h.32.f10b25a7fd7ad45b9a40904c33f28816
+                           .group:00000000 wm4.MK64F12.h.105.e884e5c80776532d2ec0f5c21e2ea7cb
+                           .group:00000000 wm4.core_cm4.h.42.42f38327ee0970d80f60117e6a3ba2b0
+                           .group:00000000 wm4.cmsis_gcc.h.36.39970cb43ce4b53c82644a1f9bc2eab9
+                           .group:00000000 wm4.core_cm4.h.223.7b48c9958ef5573320c4765074c8b0ce
+                           .group:00000000 wm4.system_MK64F12.h.109.c6d21568e03be21b21c922eb7345d6e3
+                           .group:00000000 wm4.MK64F12.h.475.cafa8e1e521f96f0b72de286863a6df7
+                           .group:00000000 wm4.MK64F12_features.h.92.512cea46d882153168efeec0bc3a9da7
+                           .group:00000000 wm4.hardware.h.27.0531344360c1b4ef1fba1263e2a4c488
+                           .group:00000000 wm4.GPIO.h.3.3ad5afaee119954e5c1de4410a35f962
+
+UNDEFINED SYMBOLS
+LED_PISR

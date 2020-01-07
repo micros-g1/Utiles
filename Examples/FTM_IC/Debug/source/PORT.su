@@ -1,0 +1,16 @@
+core_cm4.h:1626:22:NVIC_EnableIRQ	16	static
+PORT.c:5:6:PORT_Init	8	static
+PORT.c:38:6:PORT_SetPullResistorMode	24	static
+PORT.c:44:6:PORT_SetPullUpMode	24	static
+PORT.c:50:6:PORT_SetOpenDrainMode	24	static
+PORT.c:56:6:PORT_SetPassiveFilterMode	24	static
+PORT.c:62:6:PORT_SetSlowSlewRateMode	24	static
+PORT.c:68:6:PORT_SetHighDriveStrengthMode	24	static
+PORT.c:74:6:PORT_SetMuxMode	24	static
+PORT.c:80:6:PORT_SetInterruptMode	24	static
+PORT.c:86:6:PORT_IsInterruptPending	16	static
+PORT.c:91:6:PORT_ClearInterruptFlag	16	static
+PORT.c:96:6:PORT_Configure	24	static
+PORT.c:116:6:PORT_Configure2	24	static
+PORT.c:128:13:PORT_GetPortFlags	16	static
+PORT.c:133:6:PORT_ClearPortFlags	16	static

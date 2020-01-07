@@ -1,0 +1,484 @@
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"hardware.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.bss.__LDM_interruptDisableCount,"aw",%nobits
+  18              		.align	2
+  21              	__LDM_interruptDisableCount:
+  22 0000 00000000 		.space	4
+  23              		.section	.text.hw_Init,"ax",%progbits
+  24              		.align	1
+  25              		.global	hw_Init
+  26              		.arch armv7e-m
+  27              		.syntax unified
+  28              		.thumb
+  29              		.thumb_func
+  30              		.fpu fpv4-sp-d16
+  32              	hw_Init:
+  33              	.LFB123:
+  34              		.file 1 "../source/hardware.c"
+   1:../source/hardware.c **** /*
+   2:../source/hardware.c ****  * system.c
+   3:../source/hardware.c ****  *
+   4:../source/hardware.c ****  *  Created on: May 1, 2015
+   5:../source/hardware.c ****  *      Author: Juan Pablo VEGA - Laboratorio de Microprocesadores
+   6:../source/hardware.c ****  */
+   7:../source/hardware.c **** 
+   8:../source/hardware.c **** #include "hardware.h"
+   9:../source/hardware.c **** 
+  10:../source/hardware.c **** static uint32_t __LDM_interruptDisableCount = 0;
+  11:../source/hardware.c **** 
+  12:../source/hardware.c **** void hw_Init (void)
+  13:../source/hardware.c **** {
+  35              		.loc 1 13 1
+  36              		.cfi_startproc
+  37              		@ args = 0, pretend = 0, frame = 0
+  38              		@ frame_needed = 1, uses_anonymous_args = 0
+  39              		@ link register save eliminated.
+  40 0000 80B4     		push	{r7}
+  41              		.cfi_def_cfa_offset 4
+  42              		.cfi_offset 7, -4
+  43 0002 00AF     		add	r7, sp, #0
+  44              		.cfi_def_cfa_register 7
+  14:../source/hardware.c **** 	SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2)); /* set CP10, CP11 for Full Access to the FPU*/
+  45              		.loc 1 14 13
+  46 0004 344B     		ldr	r3, .L5
+  47 0006 D3F88830 		ldr	r3, [r3, #136]
+  48 000a 334A     		ldr	r2, .L5
+  49 000c 43F47003 		orr	r3, r3, #15728640
+  50 0010 C2F88830 		str	r3, [r2, #136]
+  15:../source/hardware.c **** 
+  16:../source/hardware.c **** 	WDOG->UNLOCK  = WDOG_UNLOCK_WDOGUNLOCK(0xC520); /* Key 1 */
+  51              		.loc 1 16 6
+  52 0014 314B     		ldr	r3, .L5+4
+  53              		.loc 1 16 16
+  54 0016 4CF22052 		movw	r2, #50464
+  55 001a DA81     		strh	r2, [r3, #14]	@ movhi
+  17:../source/hardware.c **** 	WDOG->UNLOCK  = WDOG_UNLOCK_WDOGUNLOCK(0xD928); /* Key 2 */
+  56              		.loc 1 17 6
+  57 001c 2F4B     		ldr	r3, .L5+4
+  58              		.loc 1 17 16
+  59 001e 4DF62812 		movw	r2, #55592
+  60 0022 DA81     		strh	r2, [r3, #14]	@ movhi
+  18:../source/hardware.c **** 	WDOG->STCTRLH = WDOG_STCTRLH_ALLOWUPDATE_MASK | WDOG_STCTRLH_CLKSRC_MASK | 0x0100U; /* Disable WDO
+  61              		.loc 1 18 6
+  62 0024 2D4B     		ldr	r3, .L5+4
+  63              		.loc 1 18 16
+  64 0026 4FF48972 		mov	r2, #274
+  65 002a 1A80     		strh	r2, [r3]	@ movhi
+  19:../source/hardware.c **** 
+  20:../source/hardware.c **** 	PMC->REGSC |= PMC_REGSC_ACKISO_MASK; /* Release hold with ACKISO:  Only has an effect if recoverin
+  66              		.loc 1 20 13
+  67 002c 2C4B     		ldr	r3, .L5+8
+  68 002e 9B78     		ldrb	r3, [r3, #2]
+  69 0030 DBB2     		uxtb	r3, r3
+  70 0032 2B4A     		ldr	r2, .L5+8
+  71 0034 43F00803 		orr	r3, r3, #8
+  72 0038 DBB2     		uxtb	r3, r3
+  73 003a 9370     		strb	r3, [r2, #2]
+  21:../source/hardware.c **** 
+  22:../source/hardware.c **** 	SIM->CLKDIV1 = SIM_CLKDIV1_OUTDIV1(0x00) | SIM_CLKDIV1_OUTDIV2(0x01) | SIM_CLKDIV1_OUTDIV3(0x01) |
+  74              		.loc 1 22 5
+  75 003c 294B     		ldr	r3, .L5+12
+  76              		.loc 1 22 15
+  77 003e 03F58253 		add	r3, r3, #4160
+  78 0042 0433     		adds	r3, r3, #4
+  79 0044 284A     		ldr	r2, .L5+16
+  80 0046 1A60     		str	r2, [r3]
+  23:../source/hardware.c **** 
+  24:../source/hardware.c **** 	SIM->SOPT1 |= SIM_SOPT1_OSC32KSEL(0x03); /* Set 32 kHz clock source (ERCLK32K) */
+  81              		.loc 1 24 13
+  82 0048 264B     		ldr	r3, .L5+12
+  83 004a 1B68     		ldr	r3, [r3]
+  84 004c 254A     		ldr	r2, .L5+12
+  85 004e 43F44023 		orr	r3, r3, #786432
+  86 0052 1360     		str	r3, [r2]
+  25:../source/hardware.c **** 	SIM->SOPT2 = SIM_SOPT2_PLLFLLSEL_MASK; /* Set high frequency clock source (PLL) */
+  87              		.loc 1 25 5
+  88 0054 234B     		ldr	r3, .L5+12
+  89              		.loc 1 25 13
+  90 0056 03F58053 		add	r3, r3, #4096
+  91 005a 0433     		adds	r3, r3, #4
+  92 005c 4FF44032 		mov	r2, #196608
+  93 0060 1A60     		str	r2, [r3]
+  26:../source/hardware.c **** 	// Ports Enable
+  27:../source/hardware.c **** 	//SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK | SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTC_MASK | SIM_SCGC5_POR
+  28:../source/hardware.c **** 
+  29:../source/hardware.c **** 
+  30:../source/hardware.c **** 	MCG->SC = MCG_SC_FCRDIV(0x02); /* Fast clock internal reference divider */
+  94              		.loc 1 30 5
+  95 0062 224B     		ldr	r3, .L5+20
+  96              		.loc 1 30 10
+  97 0064 0422     		movs	r2, #4
+  98 0066 1A72     		strb	r2, [r3, #8]
+  31:../source/hardware.c **** 	MCG->C2 = MCG_C2_RANGE(0x02); /* High frequency range external reference selection */
+  99              		.loc 1 31 5
+ 100 0068 204B     		ldr	r3, .L5+20
+ 101              		.loc 1 31 10
+ 102 006a 2022     		movs	r2, #32
+ 103 006c 5A70     		strb	r2, [r3, #1]
+  32:../source/hardware.c **** 
+  33:../source/hardware.c **** 	OSC->CR = OSC_CR_ERCLKEN_MASK; /* Set external reference clock (OSCERCLK) */
+ 104              		.loc 1 33 5
+ 105 006e 204B     		ldr	r3, .L5+24
+ 106              		.loc 1 33 10
+ 107 0070 8022     		movs	r2, #128
+ 108 0072 1A70     		strb	r2, [r3]
+  34:../source/hardware.c **** 
+  35:../source/hardware.c **** 	MCG->C7 = MCG_C7_OSCSEL(0x00); /* Set FLL external reference clock (OSCCLK0) */
+ 109              		.loc 1 35 5
+ 110 0074 1D4B     		ldr	r3, .L5+20
+ 111              		.loc 1 35 10
+ 112 0076 0022     		movs	r2, #0
+ 113 0078 1A73     		strb	r2, [r3, #12]
+  36:../source/hardware.c **** 	MCG->C1 = MCG_C1_CLKS(0x02) | MCG_C1_FRDIV(0x07); /* Set external reference as source, FLL externa
+ 114              		.loc 1 36 5
+ 115 007a 1C4B     		ldr	r3, .L5+20
+ 116              		.loc 1 36 10
+ 117 007c B822     		movs	r2, #184
+ 118 007e 1A70     		strb	r2, [r3]
+  37:../source/hardware.c **** 	while((MCG->S & MCG_S_IREFST_MASK) != 0x00U); /* Check external reference validation */
+ 119              		.loc 1 37 7
+ 120 0080 00BF     		nop
+ 121              	.L2:
+ 122              		.loc 1 37 12 discriminator 1
+ 123 0082 1A4B     		ldr	r3, .L5+20
+ 124 0084 9B79     		ldrb	r3, [r3, #6]
+ 125 0086 DBB2     		uxtb	r3, r3
+ 126              		.loc 1 37 16 discriminator 1
+ 127 0088 03F01003 		and	r3, r3, #16
+ 128              		.loc 1 37 7 discriminator 1
+ 129 008c 002B     		cmp	r3, #0
+ 130 008e F8D1     		bne	.L2
+  38:../source/hardware.c **** 	MCG->C5 = MCG_C5_PRDIV0(0x0F); /* Set PLL divider while PLL turned off */
+ 131              		.loc 1 38 5
+ 132 0090 164B     		ldr	r3, .L5+20
+ 133              		.loc 1 38 10
+ 134 0092 0F22     		movs	r2, #15
+ 135 0094 1A71     		strb	r2, [r3, #4]
+  39:../source/hardware.c **** 	MCG->C6 = MCG_C6_PLLS_MASK | MCG_C6_VDIV0(0x08); /* Set PLL multiplier and PLL select */
+ 136              		.loc 1 39 5
+ 137 0096 154B     		ldr	r3, .L5+20
+ 138              		.loc 1 39 10
+ 139 0098 4822     		movs	r2, #72
+ 140 009a 5A71     		strb	r2, [r3, #5]
+  40:../source/hardware.c **** 	while((MCG->S & MCG_S_LOCK0_MASK) == 0x00U); /* Wait until PLL is locked*/
+ 141              		.loc 1 40 7
+ 142 009c 00BF     		nop
+ 143              	.L3:
+ 144              		.loc 1 40 12 discriminator 1
+ 145 009e 134B     		ldr	r3, .L5+20
+ 146 00a0 9B79     		ldrb	r3, [r3, #6]
+ 147 00a2 DBB2     		uxtb	r3, r3
+ 148              		.loc 1 40 16 discriminator 1
+ 149 00a4 03F04003 		and	r3, r3, #64
+ 150              		.loc 1 40 7 discriminator 1
+ 151 00a8 002B     		cmp	r3, #0
+ 152 00aa F8D0     		beq	.L3
+  41:../source/hardware.c **** 	MCG->C1 &= ~MCG_C1_CLKS_MASK;
+ 153              		.loc 1 41 10
+ 154 00ac 0F4B     		ldr	r3, .L5+20
+ 155 00ae 1B78     		ldrb	r3, [r3]
+ 156 00b0 DBB2     		uxtb	r3, r3
+ 157 00b2 0E4A     		ldr	r2, .L5+20
+ 158 00b4 03F03F03 		and	r3, r3, #63
+ 159 00b8 DBB2     		uxtb	r3, r3
+ 160 00ba 1370     		strb	r3, [r2]
+  42:../source/hardware.c **** 	while((MCG->S & MCG_S_CLKST_MASK) != 0x0CU); /* Wait until output of the PLL is selected */
+ 161              		.loc 1 42 7
+ 162 00bc 00BF     		nop
+ 163              	.L4:
+ 164              		.loc 1 42 12 discriminator 1
+ 165 00be 0B4B     		ldr	r3, .L5+20
+ 166 00c0 9B79     		ldrb	r3, [r3, #6]
+ 167 00c2 DBB2     		uxtb	r3, r3
+ 168              		.loc 1 42 16 discriminator 1
+ 169 00c4 03F00C03 		and	r3, r3, #12
+ 170              		.loc 1 42 7 discriminator 1
+ 171 00c8 0C2B     		cmp	r3, #12
+ 172 00ca F8D1     		bne	.L4
+  43:../source/hardware.c **** 
+  44:../source/hardware.c **** 
+  45:../source/hardware.c **** 
+  46:../source/hardware.c **** #if 0
+  47:../source/hardware.c **** 	static PORT_Type* const portBaseList[FSL_FEATURE_SOC_PORT_COUNT] = PORT_BASE_PTRS;
+  48:../source/hardware.c **** 
+  49:../source/hardware.c **** 	int i;
+  50:../source/hardware.c **** 	for (i=0 ; i<FSL_FEATURE_SOC_PORT_COUNT ; ++i)
+  51:../source/hardware.c **** 		portBaseList[i]->ISFR = PORT_ISFR_ISF_MASK;
+  52:../source/hardware.c **** #endif
+  53:../source/hardware.c **** 
+  54:../source/hardware.c **** }
+ 173              		.loc 1 54 1
+ 174 00cc 00BF     		nop
+ 175 00ce BD46     		mov	sp, r7
+ 176              		.cfi_def_cfa_register 13
+ 177              		@ sp needed
+ 178 00d0 5DF8047B 		ldr	r7, [sp], #4
+ 179              		.cfi_restore 7
+ 180              		.cfi_def_cfa_offset 0
+ 181 00d4 7047     		bx	lr
+ 182              	.L6:
+ 183 00d6 00BF     		.align	2
+ 184              	.L5:
+ 185 00d8 00ED00E0 		.word	-536810240
+ 186 00dc 00200540 		.word	1074077696
+ 187 00e0 00D00740 		.word	1074253824
+ 188 00e4 00700440 		.word	1074032640
+ 189 00e8 00001301 		.word	18022400
+ 190 00ec 00400640 		.word	1074151424
+ 191 00f0 00500640 		.word	1074155520
+ 192              		.cfi_endproc
+ 193              	.LFE123:
+ 195              		.section	.text.hw_EnableInterrupts,"ax",%progbits
+ 196              		.align	1
+ 197              		.global	hw_EnableInterrupts
+ 198              		.syntax unified
+ 199              		.thumb
+ 200              		.thumb_func
+ 201              		.fpu fpv4-sp-d16
+ 203              	hw_EnableInterrupts:
+ 204              	.LFB124:
+  55:../source/hardware.c **** 
+  56:../source/hardware.c **** void hw_EnableInterrupts (void)
+  57:../source/hardware.c **** {
+ 205              		.loc 1 57 1
+ 206              		.cfi_startproc
+ 207              		@ args = 0, pretend = 0, frame = 0
+ 208              		@ frame_needed = 1, uses_anonymous_args = 0
+ 209              		@ link register save eliminated.
+ 210 0000 80B4     		push	{r7}
+ 211              		.cfi_def_cfa_offset 4
+ 212              		.cfi_offset 7, -4
+ 213 0002 00AF     		add	r7, sp, #0
+ 214              		.cfi_def_cfa_register 7
+  58:../source/hardware.c ****     if (__LDM_interruptDisableCount > 0)
+ 215              		.loc 1 58 37
+ 216 0004 094B     		ldr	r3, .L10
+ 217 0006 1B68     		ldr	r3, [r3]
+ 218              		.loc 1 58 8
+ 219 0008 002B     		cmp	r3, #0
+ 220 000a 09D0     		beq	.L9
+  59:../source/hardware.c ****     {
+  60:../source/hardware.c ****         __LDM_interruptDisableCount--;
+ 221              		.loc 1 60 36
+ 222 000c 074B     		ldr	r3, .L10
+ 223 000e 1B68     		ldr	r3, [r3]
+ 224 0010 013B     		subs	r3, r3, #1
+ 225 0012 064A     		ldr	r2, .L10
+ 226 0014 1360     		str	r3, [r2]
+  61:../source/hardware.c **** 
+  62:../source/hardware.c ****         if (__LDM_interruptDisableCount == 0)
+ 227              		.loc 1 62 41
+ 228 0016 054B     		ldr	r3, .L10
+ 229 0018 1B68     		ldr	r3, [r3]
+ 230              		.loc 1 62 12
+ 231 001a 002B     		cmp	r3, #0
+ 232 001c 00D1     		bne	.L9
+ 233              	.LBB6:
+ 234              	.LBB7:
+ 235              		.file 2 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h"
+   1:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** /**************************************************************************//**
+   2:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****  * @file     cmsis_gcc.h
+   3:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****  * @brief    CMSIS Cortex-M Core Function/Instruction Header File
+   4:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****  * @version  V4.30
+   5:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****  * @date     20. October 2015
+   6:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****  ******************************************************************************/
+   7:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** /* Copyright (c) 2009 - 2015 ARM LIMITED
+   8:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** 
+   9:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    All rights reserved.
+  10:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    Redistribution and use in source and binary forms, with or without
+  11:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    modification, are permitted provided that the following conditions are met:
+  12:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    - Redistributions of source code must retain the above copyright
+  13:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****      notice, this list of conditions and the following disclaimer.
+  14:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    - Redistributions in binary form must reproduce the above copyright
+  15:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****      notice, this list of conditions and the following disclaimer in the
+  16:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****      documentation and/or other materials provided with the distribution.
+  17:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    - Neither the name of ARM nor the names of its contributors may be used
+  18:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****      to endorse or promote products derived from this software without
+  19:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****      specific prior written permission.
+  20:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    *
+  21:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  22:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  23:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  24:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  25:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  26:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  27:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  28:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  29:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  30:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  31:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    POSSIBILITY OF SUCH DAMAGE.
+  32:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****    ---------------------------------------------------------------------------*/
+  33:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** 
+  34:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** 
+  35:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** #ifndef __CMSIS_GCC_H
+  36:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** #define __CMSIS_GCC_H
+  37:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** 
+  38:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** /* ignore some GCC warnings */
+  39:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** #if defined ( __GNUC__ )
+  40:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** #pragma GCC diagnostic push
+  41:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wsign-conversion"
+  42:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wconversion"
+  43:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wunused-parameter"
+  44:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** #endif
+  45:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** 
+  46:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** 
+  47:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** /* ###########################  Core Function Access  ########################### */
+  48:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+  49:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****     \defgroup CMSIS_Core_RegAccFunctions CMSIS Core Register Access Functions
+  50:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****   @{
+  51:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****  */
+  52:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** 
+  53:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** /**
+  54:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****   \brief   Enable IRQ Interrupts
+  55:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****   \details Enables IRQ interrupts by clearing the I-bit in the CPSR.
+  56:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****            Can only be executed in Privileged modes.
+  57:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****  */
+  58:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __enable_irq(void)
+  59:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** {
+  60:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****   __ASM volatile ("cpsie i" : : : "memory");
+ 236              		.loc 2 60 3
+ 237              		.syntax unified
+ 238              	@ 60 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h" 1
+ 239 001e 62B6     		cpsie i
+ 240              	@ 0 "" 2
+ 241              		.thumb
+ 242              		.syntax unified
+ 243              	.L9:
+ 244              	.LBE7:
+ 245              	.LBE6:
+  63:../source/hardware.c ****         	__enable_irq();
+  64:../source/hardware.c ****     }
+  65:../source/hardware.c **** }
+ 246              		.loc 1 65 1
+ 247 0020 00BF     		nop
+ 248 0022 BD46     		mov	sp, r7
+ 249              		.cfi_def_cfa_register 13
+ 250              		@ sp needed
+ 251 0024 5DF8047B 		ldr	r7, [sp], #4
+ 252              		.cfi_restore 7
+ 253              		.cfi_def_cfa_offset 0
+ 254 0028 7047     		bx	lr
+ 255              	.L11:
+ 256 002a 00BF     		.align	2
+ 257              	.L10:
+ 258 002c 00000000 		.word	__LDM_interruptDisableCount
+ 259              		.cfi_endproc
+ 260              	.LFE124:
+ 262              		.section	.text.hw_DisableInterrupts,"ax",%progbits
+ 263              		.align	1
+ 264              		.global	hw_DisableInterrupts
+ 265              		.syntax unified
+ 266              		.thumb
+ 267              		.thumb_func
+ 268              		.fpu fpv4-sp-d16
+ 270              	hw_DisableInterrupts:
+ 271              	.LFB125:
+  66:../source/hardware.c **** void hw_DisableInterrupts (void)
+  67:../source/hardware.c **** {
+ 272              		.loc 1 67 1
+ 273              		.cfi_startproc
+ 274              		@ args = 0, pretend = 0, frame = 0
+ 275              		@ frame_needed = 1, uses_anonymous_args = 0
+ 276              		@ link register save eliminated.
+ 277 0000 80B4     		push	{r7}
+ 278              		.cfi_def_cfa_offset 4
+ 279              		.cfi_offset 7, -4
+ 280 0002 00AF     		add	r7, sp, #0
+ 281              		.cfi_def_cfa_register 7
+ 282              	.LBB8:
+ 283              	.LBB9:
+  61:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** }
+  62:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** 
+  63:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** 
+  64:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** /**
+  65:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****   \brief   Disable IRQ Interrupts
+  66:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****   \details Disables IRQ interrupts by setting the I-bit in the CPSR.
+  67:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****   Can only be executed in Privileged modes.
+  68:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****  */
+  69:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __disable_irq(void)
+  70:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h **** {
+  71:/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h ****   __ASM volatile ("cpsid i" : : : "memory");
+ 284              		.loc 2 71 3
+ 285              		.syntax unified
+ 286              	@ 71 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/cmsis_gcc.h" 1
+ 287 0004 72B6     		cpsid i
+ 288              	@ 0 "" 2
+ 289              		.thumb
+ 290              		.syntax unified
+ 291              	.LBE9:
+ 292              	.LBE8:
+  68:../source/hardware.c ****     __disable_irq();
+  69:../source/hardware.c **** 
+  70:../source/hardware.c ****     __LDM_interruptDisableCount++;
+ 293              		.loc 1 70 32
+ 294 0006 054B     		ldr	r3, .L13
+ 295 0008 1B68     		ldr	r3, [r3]
+ 296 000a 0133     		adds	r3, r3, #1
+ 297 000c 034A     		ldr	r2, .L13
+ 298 000e 1360     		str	r3, [r2]
+  71:../source/hardware.c **** }
+ 299              		.loc 1 71 1
+ 300 0010 00BF     		nop
+ 301 0012 BD46     		mov	sp, r7
+ 302              		.cfi_def_cfa_register 13
+ 303              		@ sp needed
+ 304 0014 5DF8047B 		ldr	r7, [sp], #4
+ 305              		.cfi_restore 7
+ 306              		.cfi_def_cfa_offset 0
+ 307 0018 7047     		bx	lr
+ 308              	.L14:
+ 309 001a 00BF     		.align	2
+ 310              	.L13:
+ 311 001c 00000000 		.word	__LDM_interruptDisableCount
+ 312              		.cfi_endproc
+ 313              	.LFE125:
+ 315              		.text
+ 316              	.Letext0:
+ 317              		.file 3 "/usr/local/mcuxpressoide-11.0.0_2516/ide/plugins/com.nxp.mcuxpresso.tools.linux_11.0.0.20
+ 318              		.file 4 "/usr/local/mcuxpressoide-11.0.0_2516/ide/plugins/com.nxp.mcuxpresso.tools.linux_11.0.0.20
+ 319              		.file 5 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/core_cm4.h"
+ 320              		.file 6 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/system_MK64F12.h"
+ 321              		.file 7 "/home/jacoby/Documents/MCUXpresso_11.0.0_2516/workspace/FTM_OVF/CMSIS/MK64F12.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 hardware.c
+     /tmp/ccFqX46y.s:18     .bss.__LDM_interruptDisableCount:0000000000000000 $d
+     /tmp/ccFqX46y.s:21     .bss.__LDM_interruptDisableCount:0000000000000000 __LDM_interruptDisableCount
+     /tmp/ccFqX46y.s:24     .text.hw_Init:0000000000000000 $t
+     /tmp/ccFqX46y.s:32     .text.hw_Init:0000000000000000 hw_Init
+     /tmp/ccFqX46y.s:185    .text.hw_Init:00000000000000d8 $d
+     /tmp/ccFqX46y.s:196    .text.hw_EnableInterrupts:0000000000000000 $t
+     /tmp/ccFqX46y.s:203    .text.hw_EnableInterrupts:0000000000000000 hw_EnableInterrupts
+     /tmp/ccFqX46y.s:258    .text.hw_EnableInterrupts:000000000000002c $d
+     /tmp/ccFqX46y.s:263    .text.hw_DisableInterrupts:0000000000000000 $t
+     /tmp/ccFqX46y.s:270    .text.hw_DisableInterrupts:0000000000000000 hw_DisableInterrupts
+     /tmp/ccFqX46y.s:311    .text.hw_DisableInterrupts:000000000000001c $d
+                           .group:0000000000000000 wm4.0.e9a4c502d1288a7f4530c6554342258b
+                           .group:0000000000000000 wm4.redlib_version.h.16.f905717e4b3a91dcbdbb631865150df4
+                           .group:0000000000000000 wm4.libconfigarm.h.19.34723c94cbd19598192aa6b1e87fca41
+                           .group:0000000000000000 wm4.stdint.h.31.58198de4ea930fb897655479091e17c7
+                           .group:0000000000000000 wm4.stdbool.h.15.fddf1cb2402fd739d8e2516677869231
+                           .group:0000000000000000 wm4.fsl_device_registers.h.32.f10b25a7fd7ad45b9a40904c33f28816
+                           .group:0000000000000000 wm4.MK64F12.h.105.e884e5c80776532d2ec0f5c21e2ea7cb
+                           .group:0000000000000000 wm4.core_cm4.h.42.42f38327ee0970d80f60117e6a3ba2b0
+                           .group:0000000000000000 wm4.cmsis_gcc.h.36.39970cb43ce4b53c82644a1f9bc2eab9
+                           .group:0000000000000000 wm4.core_cm4.h.223.7b48c9958ef5573320c4765074c8b0ce
+                           .group:0000000000000000 wm4.system_MK64F12.h.109.c6d21568e03be21b21c922eb7345d6e3
+                           .group:0000000000000000 wm4.MK64F12.h.475.cafa8e1e521f96f0b72de286863a6df7
+                           .group:0000000000000000 wm4.MK64F12_features.h.92.512cea46d882153168efeec0bc3a9da7
+                           .group:0000000000000000 wm4.hardware.h.27.0531344360c1b4ef1fba1263e2a4c488
+
+NO UNDEFINED SYMBOLS
