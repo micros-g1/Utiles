@@ -1,0 +1,3 @@
+App.c:34:6:App_Init	8	static
+App.c:40:6:App_Run	8	static
+App.c:53:13:delayLoop	16	static
