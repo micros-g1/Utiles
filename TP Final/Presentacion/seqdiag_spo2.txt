@@ -1,0 +1,39 @@
+title SpO2
+
+participant ISR
+participant deferred_processing_task
+participant calculus_task
+participant sensor_task
+
+autoactivation on
+
+activate sensor_task
+activate deferred_processing_task
+activate calculus_task
+[->ISR: interrupt
+ISR->deferred_processing_task: SemaphoreGive
+deactivate ISR
+deactivate deferred_processing_task
+deferred_processing_task->sensor_task: xQueueSend
+deactivate sensor_task
+sensor_task->deferred_processing_task: xQueueReceive
+deactivate deferred_processing_task
+group #2f2e7b BPM & SPO2 #white [100th sample]
+deferred_processing_task->calculus_task:SemaphoreGive
+deactivate calculus_task
+end
+
+calculus_task->ISR: interrupt
+ISR->deferred_processing_task:SemaphoreGive
+deactivate deferred_processing_task
+deactivate ISR
+deferred_processing_task->sensor_task: xQueueSend
+deactivate sensor_task
+sensor_task->deferred_processing_task: xQueueReceive
+deactivate deferred_processing_task
+
+deferred_processing_task->calculus_task: SemaphoreTake
+deactivate calculus_task
+calculus_task->sensor_task: xQueueSend
+deactivate sensor_task
+end

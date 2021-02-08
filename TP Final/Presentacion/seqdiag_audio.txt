@@ -1,0 +1,37 @@
+title Audio player
+
+participant "idle task" as idle
+participant alarm_timer_callback
+participant audio_player_task
+participant "SAI transfer" as SAI
+participant "uda_finished_chunk" as uda
+
+autoactivation on
+
+entryspacing 1.1
+idle->alarm_timer_callback:timeout
+box over alarm_timer_callback:Add tracks to queue
+alarm_timer_callback->audio_player_task: SemaphoreGive
+deactivate alarm_timer_callback
+box over audio_player_task:MP3 decode
+loop #2f2e7b #white play queued tracks
+box over audio_player_task:Start non-blocking SAI transfer
+box over audio_player_task:MP3 decode
+audio_player_task->idle:SemaphoreTake
+deactivate 
+loop #violet transfer chunk
+idle->SAI:interrupt
+box over SAI:<align:center>Refill FIFO</align>
+SAI->idle:yield from interrupt
+deactivate idle
+deactivate SAI
+end
+idle->uda: finished callback
+deactivate SAI
+uda->audio_player_task:SemaphoreGive
+deactivate audio_player_task
+deactivate uda
+end
+audio_player_task->idle:SemaphoreTake
+deactivate audio_player_task
+deactivate idle

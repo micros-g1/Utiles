@@ -1,0 +1,34 @@
+title Example app flow
+
+participant idle
+participant sensor_task
+participant audio_task
+participant "FreeRTOS UART transfer" as freertos
+participant ISR
+participant deferred_processing_task
+
+autoactivation on
+activate sensor_task
+sensor_task->idle: xQueueReceive
+deactivate sensor_task
+idle->ISR: interrupt
+deactivate idle
+ISR->deferred_processing_task: xSemaphoreGive
+deactivate ISR
+deferred_processing_task->sensor_task: xQueueSend
+deactivate deferred_processing_task
+sensor_task->freertos: send via Bluetooth
+deactivate sensor_task
+freertos->sensor_task:
+deactivate freertos
+group #2f2e7b alarm #white [out of range]
+sensor_task->audio_task: sound alarm
+deactivate sensor_task
+box over audio_task: restart audio timer
+audio_task->sensor_task:
+deactivate audio_task
+sensor_task->freertos:send via Bluetooth
+deactivate sensor_task
+freertos->sensor_task:
+deactivate freertos
+end
