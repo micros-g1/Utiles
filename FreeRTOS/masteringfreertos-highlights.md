@@ -39,7 +39,7 @@
 - implemented as C functions
 - prototype: receive void pointer, return void
 - must not be allowed to return
-	- no statement
+	- no `return` statement
 	- not allowed to execute past the end of the function
 	- if no longer required, should be explicitly deleted
 		- a task can delete itself by calling `vTaskDelete(NULL)` (by using `NULL`, we signal that the calling task is to be deleted)
@@ -68,7 +68,7 @@ simply as ‘ticks’
 - Blocked state
 	- waiting for an event
 	- a task can be waiting for a time-related (such as a timer expiring) or a syncronization event (such as data arriving on a queue)
-	- It is possible for a task to block on a synchronization event with a timeout, effectively blocking on both types of event simultaneously. For example, a task may choose to wait for a maximum of 10 milliseconds for data to arrive on a queue. The task will leave the Blocked state if either data arrives within 10 milliseconds, or 10 milliseconds pass with no data arriving.
+	- It is possible for a task to wait on a synchronization event with a timeout, effectively blocking on both types of event simultaneously. For example, a task may choose to wait for a maximum of 10 milliseconds for data to arrive on a queue. The task will leave the Blocked state if either data arrives within 10 milliseconds, or 10 milliseconds pass with no data arriving.
 	- example timer: 
 		- `void vTaskDelay(TickType_t xTicksToDelay)` 
 		- `void vTaskDelayUntil(TickType_t * pxPreviousWakeTime, TickType_t xTimeIncrement)`
@@ -127,7 +127,7 @@ simply as ‘ticks’
 - holds a finite number of fixed data items
 - the length of the queue and the size of each data item are set when the queue is created
 - normally used as FIFO. It is also possible to wirte to the front of a queue, and to overwrite data that is already at the front of a queue
-- recommended when data size isn't too large: queue by copy (as opposed to by referenced)
+- recommended when data size isn't too large: queue by copy (as opposed to by reference)
 - Any number of tasks can write to the same queue, and any number of tasks can read from the same queue. In practice it is very common for a queue to have multiple writers, but much less common for a queue to have multiple readers.
 - When a task attempts to read/write from a queue, it can optionally specify a ‘block’ time. This is the time the task will be kept in the Blocked state to wait for data to be available from the queue/ for space to become available, should the queue already be empty/full.
 - Queues can have multiple readers/writers, so it is possible for a single queue to have more than one task blocked on it waiting for data/for space to write. When this is the case, only one task will be unblocked when data/space becomes available. The task that is unblocked will always be the highest priority task that is waiting for data/space. If the blocked tasks have equal priority, then the task that has been waiting for data the longest will be unblocked. 
@@ -151,5 +151,66 @@ simply as ‘ticks’
 - Reading: 
 	- `BaseType_t xQueueReceive( QueueHandle_t xQueue, void * const pvBuffer, TickType_t xTicksToWait );`
 	
+
+### 4.4 Receiving Data from Multiple Sources
+
+### 4.7 Using a Queue to Create a Mailbox
+
+
+## 5 Software Timer Management
+
+### 5.1 Introduction and Scope
+
+### 5.2 Software Timer Callback Functions
+
+### 5.3 Attributes and States of a Software Timer
+
+### 5.4 The Context of a Software Timer
+
+### 5.5 Creating and Starting a Software Timer
+
+### 5.6 The Timer ID
+
+### 5.7 Changing the Period of a Timer
+
+### 5.8 Resetting a Software Timer
+
+
+
+## 6 Interrupt Management
+
+### 6.1 Chapter Introduction and Scope
+- It is important to draw a distinction between the priority of a task, and the priority of an interrupt:
+  - the priority of a task assigned in software by the application writer, and a software algorithm (the scheduler) decides which task will be in the Running state
+  - an interrupt service routine is a hardware feature because the hardware controls which interrupt service routine will run, and when it will run. __Tasks will only run when there are no ISRs running, so the lowest priority interrupt will interrupt the highest priority task, and there is no way to pre-empt and ISR__.
+
+### 6.2 Using the FreeRTOS API from an ISR
+- The interrupt safe API: many FreeRTOS API functions perform actions that are not valid inside an ISR. FreeRTOS solves this problem by providing two versions of some API functions; one version for use from tasks, and one version for use from ISRs. Functions intended for use from ISRs have “FromISR” appended to their name. __Never call a FreeRTOS API function that does not have “FromISR” in its name from an ISR.__
+
+### 6.3 Deferred Interrupt Processing
+An interrupt service routine must record the cause of the interrupt, and clear the interrupt. Any other processing necessitated by the interrupt can often be performed in a task, allowing the interrupt service routine to exit as quickly as is practical. This is called ‘deferred interrupt processing’, because the processing necessitated by the interrupt is ‘deferred’ from the ISR to a task.
+
+Deferring interrupt processing to a task also allows the application writer to prioritize the processing relative to other tasks in the application, and use all the FreeRTOS API functions.
+
+If the priority of the task to which interrupt processing is deferred is above the priority of any other task, then the processing will be performed immediately, just as if the processing had been performed in the ISR itself.
+
+There is no absolute rule as to when it is best to perform all processing necessitated by an interrupt in the ISR, and when it is best to defer part of the processing to a task. Deferring processing to a task is most useful when:
+- The processing necessitated by the interrupt is not trivial. For example, if the interrupt is just storing the result of an analog to digital conversion, then it is almost certain this is best performed inside the ISR, but if result of the conversion must also be passed through a software filter, then it may be best to execute the filter in a task.
+- It is convenient for the interrupt processing to perform an action that cannot be performed inside an ISR, such as write to a console, or allocate memory.
+- The interrupt processing is not deterministic — meaning it is not known in advance how long the processing will take.
+
+### 6.4 Binary Semaphores Used for Synchronization
+The interrupt safe version of the Binary Semaphore API can be used to unblock a task each time a particular interrupt occurs, effectively synchronizing the task with the interrupt. This allows the majority of the interrupt event processing to be implemented within the synchronized task, with only a very fast and short portion remaining directly in the ISR. As described in the previous section, the binary semaphore is used to ‘defer’ interrupt processing to a task.
+
+The ISR can then be implemented to include a call to `portYIELD_FROM_ISR()`, ensuring the ISR returns directly to the task to which interrupt processing is being deferred. This has the effect of ensuring the entire event processing executes contiguously (without a break) in time, just as if it had all been implemented within the ISR itself.
+
+
+## 7 Resource Management
+
+## 8 Event Groups
+
+## 9 Task Notifications
+
+## 12 Trouble Shooting
 
  
